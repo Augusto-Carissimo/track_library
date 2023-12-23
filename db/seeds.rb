@@ -3,6 +3,8 @@ require 'csv'
 csv_text = File.read(Rails.root.join('lib', 'seeds', 'library.csv'))
 csv = CSV.parse(csv_text, :encoding => 'ISO-8859-1')
 
+Genre.create(name: 'Rock')
+
 csv.map do |row|
   Artist.create(name: row[1])
 rescue => e
