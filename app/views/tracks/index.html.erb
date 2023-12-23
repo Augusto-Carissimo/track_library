@@ -1,0 +1,28 @@
+<table style="width:50%">
+  <tr>
+    <th class='alnleft'>Track</th>
+    <th class='alnleft'>Band</th>
+    <th class='alnleft'>Album</th>
+    <th class='alnleft'>Len</th>
+    <th class='alnleft'>Rating</th>
+  </tr>
+  <% @tracks.each do |track| %>
+    <tr>
+      <td>
+        <%= track[0] %>
+      </td>
+      <td>
+        <%= track[1] %>
+      </td>
+      <td>
+        <%= track[2] %>
+      </td>
+      <td>
+        <%= track[3] %>
+      </td>
+      <td>
+        <%= track[4] %>
+      </td>
+    </tr>
+  <% end %>
+</table>
