@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_12_21_133638) do
+ActiveRecord::Schema[7.0].define(version: 2023_12_25_171403) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -30,28 +30,18 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_21_133638) do
     t.index ["name"], name: "index_artists_on_name", unique: true
   end
 
-  create_table "genres", force: :cascade do |t|
-    t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["name"], name: "index_genres_on_name", unique: true
-  end
-
   create_table "tracks", force: :cascade do |t|
     t.string "title"
     t.string "len"
     t.integer "rating"
     t.integer "count"
     t.bigint "album_id", null: false
-    t.bigint "genre_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["album_id"], name: "index_tracks_on_album_id"
-    t.index ["genre_id"], name: "index_tracks_on_genre_id"
     t.index ["title", "album_id"], name: "index_tracks_on_title_and_album_id", unique: true
   end
 
   add_foreign_key "albums", "artists", on_delete: :cascade
   add_foreign_key "tracks", "albums", on_delete: :cascade
-  add_foreign_key "tracks", "genres", on_delete: :cascade
 end
