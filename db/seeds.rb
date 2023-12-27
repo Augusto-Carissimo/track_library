@@ -30,31 +30,39 @@ Benchmark.bm do |x|
 
   x.report {
     csv.map do |row|
-    sql = "INSERT INTO artists (name, created_at, updated_at) "\
-      "VALUES ('#{row[1]}', '#{DateTime.current}', '#{DateTime.current}');"
-    ActiveRecord::Base.connection.execute(sql)
-    rescue => e
-      e.message
-    end
+      artist_name = ActiveRecord::Base.connection.quote("#{row[1]}")
+      album_title = ActiveRecord::Base.connection.quote("#{row[2]}")
+      track_name = ActiveRecord::Base.connection.quote("#{row[0]}")
+      count = ActiveRecord::Base.connection.quote("#{row[3].to_i}")
+      rating = ActiveRecord::Base.connection.quote("#{row[4].to_i}")
+      len = ActiveRecord::Base.connection.quote("#{Time.at(row[5].to_i).utc.strftime "%M:%S"}")
+      date = ActiveRecord::Base.connection.quote("#{DateTime.current}")
 
-    csv.map do|row|
-      subquery = "SELECT id FROM artists WHERE name='#{row[1]}'"
-      sql =
-      "INSERT INTO albums (title, artist_id, created_at, updated_at) "\
-        "VALUES ('#{row[2]}', (#{subquery}), '#{DateTime.current}', '#{DateTime.current}');"
-      ActiveRecord::Base.connection.execute(sql)
-    rescue => e
-      e.message
-    end
+      begin
+        artist_query = "INSERT INTO artists (name, created_at, updated_at) "\
+                          "VALUES (#{artist_name}, #{date}, #{date});"
+        ActiveRecord::Base.connection.execute(artist_query)
+      rescue => e
+        e.message
+      end
 
-    csv.map do |row|
-      subquery = "SELECT id FROM albums WHERE title='#{row[2]}'"
-      sql =
-      "INSERT INTO tracks (title, count, rating, len, album_id, created_at, updated_at) "\
-        "VALUES ('#{row[0]}', '#{row[3].to_i}', '#{row[4].to_i}', '#{Time.at(row[5].to_i).utc.strftime "%M:%S"}', (#{subquery}), '#{DateTime.current}', '#{DateTime.current}');"
-      ActiveRecord::Base.connection.execute(sql)
-    rescue => e
-      e.message
+      begin
+        artist_subquery = "SELECT id FROM artists WHERE name=#{artist_name}"
+        album_query = "INSERT INTO albums (title, artist_id, created_at, updated_at) "\
+                        "VALUES (#{album_title}, (#{artist_subquery}), #{date}, #{date});"
+        ActiveRecord::Base.connection.execute(album_query)
+      rescue => e
+        e.message
+      end
+
+      begin
+        album_subquery = "SELECT id FROM albums WHERE title=#{album_title}"
+        track_query = "INSERT INTO tracks (title, count, rating, len, album_id, created_at, updated_at) "\
+                        "VALUES (#{track_name}, #{count}, #{rating}, #{len}, (#{album_subquery}), #{date}, #{date});"
+        ActiveRecord::Base.connection.execute(track_query)
+      rescue => e
+        e.message
+      end
     end
-   }
+  }
 end
